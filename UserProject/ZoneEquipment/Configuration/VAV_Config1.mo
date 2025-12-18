@@ -1,0 +1,12 @@
+within UserProject.ZoneEquipment.Configuration;
+record VAV_Config1
+  extends Buildings.Templates.ZoneEquipment.Configuration.VAVBox(
+    final typ=Buildings.Templates.ZoneEquipment.Types.Configuration.VAVBoxReheat,
+    final have_souChiWat=false,
+    final have_souHeaWat=true,
+    final typCtl=Buildings.Templates.ZoneEquipment.Types.Controller.G36VAVBoxReheat,
+    final typDamVAV=Buildings.Templates.Components.Types.Damper.PressureIndependent,
+    final typCoiHea=Buildings.Templates.Components.Types.Coil.WaterBasedHeating,
+    final typValCoiHea=Buildings.Templates.Components.Types.Valve.TwoWayModulating,
+    final stdVen=Buildings.Controls.OBC.ASHRAE.G36.Types.VentilationStandard.ASHRAE62_1);
+end VAV_Config1;
