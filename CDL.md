@@ -58,55 +58,69 @@ The first option shall be the default. Generating the 2nd option via a command-l
 
 In addition to what is described at https://obc.lbl.gov/specification/cdl.html#evaluation-of-assignment-of-values-to-parameters the new issue that the templates raise is that the assignment of the propagated parameter (`pRel` in the example from the link) may use variables from the equipment model, which are therefore outside of the CDL scope (not within the qualified instances).
 
-The following is a draft algorithm to resolve those assignments when exporting the control sequence with modelica-json (either in English language or in CDL-JSON).
+The following algorithm resolves parameter assignments when exporting the control sequence with modelica-json (either in English language or in CDL-JSON).
 
-- Parse the parameter bindings of each qualified instance
-- Look up for the assignment of the propagated parameter. Possible cases:
-  - Literal assignment: nothing else to do, export as is
-  - Variable assignment in the form of `dat.yFanRet_min`: the value is to be found in the corresponding parameter record (also exported).
-    What do we do? Leave the reference as is? Or convert it using the class name from the Modelica package representing the user project?
-    For instance do we keep the original declaration from the Modelica template
+1. Parse the parameter bindings of each qualified instance.
+2. Look up for the assignment of the propagated parameter and handle according to the cases below.
 
-    ```mo
-    parameter Buildings.Templates.AirHandlersFans.Components.Data.VAVMultiZoneController dat;
-    ```
+#### Case 1: Literal Assignment
 
-    Or do we convert it to (option not compatible with only one exported file for each control sequence: instead we end up with one exported file for each physical system)
+Nothing to do, export as is.
 
-    ```mo
-    parameter UserProject.AirHandlersFans.Data.VAV_1 dat;
-    ```
+#### Case 2: Variable Assignment (e.g., `dat.yFanRet_min`)
 
-  - <a name="assign_expression"></a>Assignment using an expression: The expression must be evaluated. By contract, it involves only expressions permitted in CDL.
+The value is to be found in the corresponding parameter record (also exported).
 
-    The expression may involve variables from
-    - qualified instances: recursively apply that algorithm to evaluate,
-    - non-qualified instances (typically from the equipment model): for instance
+**Open question:** Leave the reference as is? Or convert it using the class name from the Modelica package representing the user project?
 
-      ```mo
-      final parameter Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns minOADes =
-      if secOutRel.typSecOut==Buildings.Templates.AirHandlersFans.Types.OutdoorSection.SingleDamper
-      then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.CommonDamper
-      elseif secOutRel.typSecOut==Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersAirflow
-      then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.SeparateDamper_AFMS
-      elseif secOutRel.typSecOut==Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersPressure
-      then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.SeparateDamper_DP
-      else Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.CommonDamper
-      ```
+For instance, do we keep the original declaration from the Modelica template:
 
-      or
+```mo
+parameter Buildings.Templates.AirHandlersFans.Components.Data.VAVMultiZoneController dat;
+```
 
-      ```mo
-      VPriSysMax_flow = secOutRel.mAirSup_flow_nominal / 1.2
-      ```
+Or do we convert it to:
 
-    Look up for the assignment of the propagated parameter, which resolves to a previous case:
-    - either an assignment from the parameter record such as `mAirSup_flow_nominal = dat.damOut.m_flow_nominal`, or
-    - a literal assignment such as `typSecOut=Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersAirflow`.
+```mo
+parameter UserProject.AirHandlersFans.Data.VAV_1 dat;
+```
 
-    Note that those variables may be within `inner/outer` components.
+(This option is not compatible with only one exported file for each control sequence: instead we end up with one exported file for each physical system.)
 
-    :question: Are conditional expressions `a=if b then c else d` allowed in CDL? [mwetter: Currently they are not allowed as we did not see a need, but if modelica-json can handle it and there is a use case, I see no problem adding it.]
+#### Case 3: Assignment Using an Expression
+
+The expression must be evaluated. By contract, it involves only expressions permitted in CDL.
+
+The expression may involve variables from:
+
+- **Qualified instances:** Recursively apply this algorithm to evaluate.
+- **Non-qualified instances** (typically from the equipment model), for example:
+
+  ```mo
+  final parameter Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns minOADes =
+    if secOutRel.typSecOut == Buildings.Templates.AirHandlersFans.Types.OutdoorSection.SingleDamper
+    then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.CommonDamper
+    elseif secOutRel.typSecOut == Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersAirflow
+    then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.SeparateDamper_AFMS
+    elseif secOutRel.typSecOut == Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersPressure
+    then Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.SeparateDamper_DP
+    else Buildings.Controls.OBC.ASHRAE.G36.Types.MultizoneAHUMinOADesigns.CommonDamper
+  ```
+
+  or
+
+  ```mo
+  VPriSysMax_flow = secOutRel.mAirSup_flow_nominal / 1.2
+  ```
+
+Look up for the assignment of the propagated parameter, which resolves to a previous case:
+
+- An assignment from the parameter record such as `mAirSup_flow_nominal = dat.damOut.m_flow_nominal`, or
+- A literal assignment such as `typSecOut = Buildings.Templates.AirHandlersFans.Types.OutdoorSection.DedicatedDampersAirflow`.
+
+Note that those variables may be within `inner/outer` components.
+
+:question: Are conditional expressions `a = if b then c else d` allowed in CDL? [mwetter: Currently they are not allowed as we did not see a need, but if modelica-json can handle it and there is a use case, I see no problem adding it.]
 
 ## Connections to Variables from the Equipment Model
 
