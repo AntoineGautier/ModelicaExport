@@ -27,8 +27,9 @@ The exported package shall have the following structure:
   - This subset is the one needed to enable/disable the control parameters and equipment characteristics in **`Data`**.
 - **`Data`**: Data records with control parameters and equipment characteristics
   - These shall be mapped to the schedules in ctrl-flow.
-  - One class shall be created for each `<SystemType>` and include the parameters for all the systems of that type.
-  - One class `AllSystems` shall also be created that extends each `<SystemType>` record and contains the declarations of all project-level parameters such as energy and ventilation standards, climate zone, project name, address, type of building, floor area, unit system, and miscellaneous notes.
+  - One record class shall be created for each `<SystemType>` and include the parameters for all the systems of that type.
+    - This record class shall *instantiate* the record annotated as "schedule" within the template, as an array with the dimension equal to the number of specified systems.
+  - One class `AllSystems` shall also be created that *extends* each `<SystemType>` record and contains the declarations of all project-level parameters such as energy and ventilation standards, climate zone, project name, address, type of building, floor area, unit system, and miscellaneous notes.
   - [In this example, parameters are provided for two VAV AHUs (one with each configuration) and 10 VAV boxes (all with the same configuration).]
 - [**`Examples`** (not required): These are example models demonstrating how the configured classes can be instantiated to build a simulation model.]
 
