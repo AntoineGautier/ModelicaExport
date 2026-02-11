@@ -5,6 +5,13 @@ Feature enhancements to modelica-json in order to support exporting the control 
 - Extract all the CDL blocks that form the control sequence
 - Parameter assignments: Develop JS functions to evaluate Modelica expressions (may include functions calls, for loops, array constructs) and include literal values in exported doc and CDL
 
+## TODO
+
+- [ ] Specify how to use configuration and data records with literal assignments from ctrl-flow Modelica export
+- [ ] Specify the format and structure for the CDL / CXF sequences for a project
+
+  > For example the user configuration may state two types of terminal units. So in CDL (or CXF) there would be two terminal unit files. But in the schedule they detailed out the parameters for 50 terminal units of each type. Some form of table of configuration parameters will be needed to be provided (with the parameters and tags for each instance) that comes along with the CDL or CXF.
+
 ## MBL Templating Contract
 
 All blocks that constitute the control sequence of a template class (further referred to as "qualified") are instantiated within a single component (the control section) named `ctl` .
