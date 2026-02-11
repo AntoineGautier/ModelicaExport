@@ -2,41 +2,8 @@
 
 ## Purpose
 
-This document provides the requirements for the Modelica Export functionality in ctrl-flow.
-An example implementation of the exported Modelica package structure is provided in the repository under `UserProject`.
-
-[Non prescriptive text is enclosed in brackets.]
-
-## Requirements
-
-### Package Structure And Content
-
-One package shall be created for _each_ user project.
-The top-level package name shall match the user-assigned project name, subject to Modelica class name constraints as defined in the Modelica Specification.
-The exported package shall have the following structure:
-
-- **`<SystemType>`**: One package shall be created for each `<SystemType>` configured by the user in the project.
-  - Each `<SystemType>` package corresponds to a package within `Buildings.Templates` or other loaded library of templates.
-  - The application shall support nested subpackages and adopt the same structure as the original Templates package.
-  - Inside each package, one class shall be created for each system configured by the user in this project:
-    - Each class shall extend the template class for the corresponding system type, and includes the class modifications corresponding to the configuration settings specified by the user through the configuration page in ctrl-flow.
-  - [In this example, `AirHandlersFans` contains two specified configurations and `ZoneEquipment` contains a single specified configuration.]
-- **`<SystemType>/Configuration`**: Data records with configuration parameters, one for each configuration
-  - All parameter bindings are ***literal assignments***: expressions shall be evaluated to their numeric/string values before export.
-  - These records only contain a subset of all the parameters that define a system configuration and which are exposed in ctrl-flow.
-  - This subset is the one needed to enable/disable the control parameters and equipment characteristics in **`Data`**.
-- **`Data`**: Data records with control parameters and equipment characteristics
-  - These shall be mapped to the schedules in ctrl-flow.
-  - One record class shall be created for each `<SystemType>` and include the parameters for all the systems of that type.
-    - This record class shall *instantiate* the record annotated as "schedule" within the template, as an array with the dimension equal to the number of specified systems.
-  - One class `AllSystems` shall also be created that *extends* each `<SystemType>` record and contains the declarations of all project-level parameters such as energy and ventilation standards, climate zone, project name, address, type of building, floor area, unit system, and miscellaneous notes.
-  - [In this example, parameters are provided for two VAV AHUs (one with each configuration) and 10 VAV boxes (all with the same configuration).]
-- [**`Examples`** (not required): These are example models demonstrating how the configured classes can be instantiated to build a simulation model.]
-
-### Dependency Management
-
-A class annotation `uses` shall be added to the exported package to specify the dependency libraries.
-[In this example, `./package.mo` contains the annotation `Buildings(version="13.0.0")`.]
+A Modelica export functionality shall be developed in ctrl-flow.
+This repository provides a mockup of the exported Modelica package under `UserProject`.
 
 ## [FAQ]
 
